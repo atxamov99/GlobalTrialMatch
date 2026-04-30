@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#16a34a"/>
+
+  <!-- Medical cross -->
+  <rect x="196" y="120" width="120" height="272" rx="24" fill="white"/>
+  <rect x="120" y="196" width="272" height="120" rx="24" fill="white"/>
+
+  <!-- Globe circle overlay (subtle) -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="12"/>
+  <ellipse cx="256" cy="256" rx="80" ry="200" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"/>
+</svg>

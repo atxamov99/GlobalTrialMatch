@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#16a34a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TrialMatch" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
+
+    <!-- SEO -->
+    <title>GlobalTrialMatch — Klinik tadqiqotlar</title>
+    <meta name="description" content="Dunyo bo'yicha 300,000+ klinik tadqiqot ichidan sizga mosini AI topadi. Bepul, tez va ishonchli." />
+    <meta name="keywords" content="klinik tadqiqot, clinical trial, clinical trials, davolash, tibbiyot" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="GlobalTrialMatch" />
+    <meta property="og:description" content="AI yordamida mos klinik tadqiqot toping" />
+    <meta property="og:type" content="website" />
+
+    <style>
+      /* splash screen */
+      #splash {
+        position: fixed; inset: 0; z-index: 9999;
+        background: #052e16;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 16px;
+        transition: opacity .4s;
+      }
+      #splash.hide { opacity: 0; pointer-events: none; }
+      #splash-icon {
+        width: 72px; height: 72px; border-radius: 20px;
+        background: #16a34a;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 38px;
+      }
+      #splash-title {
+        color: white; font-size: 22px; font-weight: 800;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      #splash-sub { color: #86efac; font-size: 14px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    </style>
+  </head>
+  <body>
+    <!-- Splash screen -->
+    <div id="splash">
+      <div id="splash-icon">⚕</div>
+      <div id="splash-title">GlobalTrialMatch</div>
+      <div id="splash-sub">Yuklanmoqda...</div>
+    </div>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const splash = document.getElementById('splash')
+          if (splash) {
+            splash.classList.add('hide')
+            setTimeout(() => splash.remove(), 400)
+          }
+        }, 800)
+      })
+    </script>
+  </body>
+</html>
