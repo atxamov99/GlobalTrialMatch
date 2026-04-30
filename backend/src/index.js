@@ -12,9 +12,23 @@ const app = express()
 const PORT = process.env.PORT || 5000
 
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGIN
-    ? process.env.ALLOWED_ORIGIN.split(',')
-    : ['http://localhost:5173', 'http://localhost:5174'],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true)
+    const allowed = process.env.ALLOWED_ORIGIN
+      ? process.env.ALLOWED_ORIGIN.split(',').map(o => o.trim())
+      : []
+    // Always allow localhost and vercel previews
+    if (
+      allowed.includes('*') ||
+      allowed.includes(origin) ||
+      origin.endsWith('.vercel.app') ||
+      origin.startsWith('http://localhost')
+    ) {
+      return callback(null, true)
+    }
+    callback(new Error('CORS: not allowed'))
+  },
   credentials: true,
 }))
 app.use(express.json())
