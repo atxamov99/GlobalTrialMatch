@@ -8,6 +8,8 @@ import LandingPage from './pages/LandingPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import ResultsPage from './pages/ResultsPage.jsx'
 import ApplicationsPage from './pages/ApplicationsPage.jsx'
+import ProfilePage from './pages/ProfilePage.jsx'
+import SavedPage from './pages/SavedPage.jsx'
 import InstallBanner from './components/InstallBanner.jsx'
 
 function PrivateRoute({ children }) {
@@ -36,6 +38,8 @@ export default function App() {
               <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
               <Route path="/results" element={<PrivateRoute><ResultsPage /></PrivateRoute>} />
               <Route path="/applications" element={<PrivateRoute><ApplicationsPage /></PrivateRoute>} />
+              <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+              <Route path="/saved" element={<PrivateRoute><SavedPage /></PrivateRoute>} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </BrowserRouter>

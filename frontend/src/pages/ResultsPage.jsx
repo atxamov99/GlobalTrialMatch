@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
-import { trialsAPI, applicationsAPI } from '../api/index.js'
+import { trialsAPI, applicationsAPI, savedAPI, matchAPI } from '../api/index.js'
 import { useAuth } from '../store/auth.jsx'
 import { useLang } from '../store/lang.jsx'
 import LangSwitcher from '../components/LangSwitcher.jsx'
@@ -10,9 +10,11 @@ function ScoreBadge({ score }) {
   return <span className={`score-badge ${cls}`}>{score}% mos</span>
 }
 
-function TrialCard({ trial, onApply, applyLabel }) {
+function TrialCard({ trial, onApply, onSave, applyLabel }) {
   const [applying, setApplying] = useState(false)
   const [applied, setApplied] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [savedOk, setSavedOk] = useState(false)
   const [err, setErr] = useState('')
 
   const handleApply = async () => {
@@ -25,6 +27,18 @@ function TrialCard({ trial, onApply, applyLabel }) {
       setErr(e.response?.data?.error || 'Xatolik')
     } finally {
       setApplying(false)
+    }
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await onSave(trial)
+      setSavedOk(true)
+    } catch {
+      setSavedOk(true) // allaqachon saqlangan bo'lishi ham mumkin
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -46,16 +60,29 @@ function TrialCard({ trial, onApply, applyLabel }) {
         )}
       </div>
       {trial.explanation && <div className="tc-explanation">💡 {trial.explanation}</div>}
+      {trial.reasons?.length > 0 && (
+        <div className="tc-reasons">
+          {trial.reasons.slice(0, 2).map((r, i) => <span key={i} className="reason-tag">✓ {r}</span>)}
+        </div>
+      )}
       {err && <div className="tc-err">{err}</div>}
       <div className="tc-actions">
         <a href={trial.url} target="_blank" rel="noreferrer" className="btn-outline-sm">
-          {trial.id ? 'Batafsil ↗' : '↗'}
+          Batafsil ↗
         </a>
+        <button
+          onClick={handleSave}
+          disabled={saving || savedOk}
+          className="btn-save"
+          title="Saqlash"
+        >
+          {savedOk ? '🔖 Saqlandi' : saving ? '...' : '🔖 Saqlash'}
+        </button>
         {applied ? (
           <span className="applied-ok">✅ Yuborildi</span>
         ) : (
           <button onClick={handleApply} disabled={applying} className="btn-apply">
-            {applying ? <><span className="btn-spinner" /></> : applyLabel}
+            {applying ? <span className="btn-spinner" /> : applyLabel}
           </button>
         )}
       </div>
@@ -74,14 +101,22 @@ export default function ResultsPage() {
 
   const diagnosis = searchParams.get('diagnosis')
   const country = searchParams.get('country')
+  const age = searchParams.get('age')
+  const gender = searchParams.get('gender')
+  const useAI = searchParams.get('useAI') === 'true'
 
   useEffect(() => {
     const fetchTrials = async () => {
       setLoading(true)
       setError('')
       try {
-        const res = await trialsAPI.search({ condition: diagnosis, country, pageSize: 20 })
-        setTrials(res.data.trials || [])
+        if (useAI && age) {
+          const res = await matchAPI.match({ diagnosis, country, age, gender })
+          setTrials(res.data.matches || [])
+        } else {
+          const res = await trialsAPI.search({ condition: diagnosis, country, pageSize: 20 })
+          setTrials(res.data.trials || [])
+        }
       } catch {
         setError('Tadqiqotlarni yuklashda xatolik.')
       } finally {
@@ -89,7 +124,13 @@ export default function ResultsPage() {
       }
     }
     if (diagnosis) fetchTrials()
-  }, [diagnosis, country])
+  }, [diagnosis, country, useAI])
+
+  const handleApply = (trial) =>
+    applicationsAPI.apply({ trial_id: trial.id, trial_title: trial.title })
+
+  const handleSave = (trial) =>
+    savedAPI.save({ trial_id: trial.id, trial_data: trial })
 
   return (
     <div className="dash-wrap">
@@ -102,10 +143,12 @@ export default function ResultsPage() {
           <nav className="dash-nav">
             <Link to="/dashboard" className="dash-nav-link">{lang.nav_search}</Link>
             <Link to="/applications" className="dash-nav-link">{lang.nav_apps}</Link>
+            <Link to="/saved" className="dash-nav-link">Saqlangan</Link>
+            <Link to="/profile" className="dash-nav-link">Profil</Link>
           </nav>
           <div className="dash-user">
             <LangSwitcher />
-            <div className="dash-avatar">{user?.name?.[0]?.toUpperCase() || 'U'}</div>
+            <div className="dash-avatar">{user?.name?.[0]?.toUpperCase()}</div>
             <span className="dash-username">{user?.name}</span>
             <button onClick={logout} className="dash-logout">{lang.logout}</button>
           </div>
@@ -114,16 +157,15 @@ export default function ResultsPage() {
 
       <main className="results-main">
         <div className="results-topbar">
-          <button onClick={() => navigate('/dashboard')} className="btn-back-new">
-            {lang.back}
-          </button>
+          <button onClick={() => navigate('/dashboard')} className="btn-back-new">{lang.back}</button>
           <div>
             <h2 className="results-title">
+              {useAI && <span className="ai-badge">🤖 AI</span>}
               "{diagnosis}"
               {country && <span className="results-country"> · {country}</span>}
             </h2>
             <p className="results-count">
-              {loading ? (lang.searching) : `${trials.length} ${lang.code === 'ru' ? 'исследований найдено' : lang.code === 'en' ? 'trials found' : 'ta tadqiqot topildi'}`}
+              {loading ? lang.searching : `${trials.length} ta tadqiqot topildi`}
             </p>
           </div>
         </div>
@@ -133,16 +175,14 @@ export default function ResultsPage() {
         {loading ? (
           <div className="loading-center">
             <div className="spinner" />
-            <p>ClinicalTrials.gov {lang.code === 'ru' ? 'загружается...' : lang.code === 'en' ? 'loading data...' : 'dan ma\'lumot olinmoqda...'}</p>
+            <p>{useAI ? '🤖 AI tahlil qilmoqda...' : "ClinicalTrials.gov dan ma'lumot olinmoqda..."}</p>
           </div>
         ) : trials.length === 0 ? (
           <div className="empty-box">
             <div className="empty-icon">😕</div>
             <h3>{lang.no_trials}</h3>
-            <p>{lang.code === 'uz' ? 'Boshqa diagnoz yoki mamlakat bilan urinib ko\'ring' : lang.code === 'en' ? 'Try a different diagnosis or country' : 'Попробуйте другой диагноз или страну'}</p>
-            <button onClick={() => navigate('/dashboard')} className="btn-apply">
-              {lang.code === 'uz' ? 'Qayta qidirish' : lang.code === 'en' ? 'Search again' : 'Искать снова'}
-            </button>
+            <p>Boshqa diagnoz yoki mamlakat bilan urinib ko'ring</p>
+            <button onClick={() => navigate('/dashboard')} className="btn-apply">Qayta qidirish</button>
           </div>
         ) : (
           <div className="trials-grid">
@@ -150,7 +190,8 @@ export default function ResultsPage() {
               <TrialCard
                 key={trial.id}
                 trial={trial}
-                onApply={t => applicationsAPI.apply({ trial_id: t.id, trial_title: t.title })}
+                onApply={handleApply}
+                onSave={handleSave}
                 applyLabel={lang.apply}
               />
             ))}

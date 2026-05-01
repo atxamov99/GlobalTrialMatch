@@ -687,6 +687,108 @@ a { text-decoration: none; color: inherit; }
 .google-btn-err { font-size: 13px; color: #dc2626; margin-top: 8px; text-align: center; }
 
 /* ══════════════════════════════════════
+   MODE TABS (Dashboard)
+══════════════════════════════════════ */
+.mode-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.mode-tab {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: white;
+  font-size: 14px; font-weight: 600; color: var(--text-2);
+  cursor: pointer; transition: all .15s;
+}
+.mode-tab:hover { border-color: var(--green); color: var(--green); }
+.mode-tab.active { background: var(--green); border-color: var(--green); color: white; }
+.mode-tab-badge {
+  background: rgba(255,255,255,.25); font-size: 11px;
+  padding: 2px 8px; border-radius: 100px;
+}
+.mode-tab:not(.active) .mode-tab-badge {
+  background: var(--green-lite); color: var(--green);
+}
+
+.ai-hint {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: #fffbeb; border: 1px solid #fde68a;
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+  font-size: 14px; color: #92400e;
+}
+.ai-profile-card {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--green-50); border: 1px solid var(--green-200);
+  border-radius: 12px; padding: 14px 20px; margin-bottom: 16px;
+}
+.apc-left { display: flex; align-items: center; gap: 12px; }
+.apc-icon { font-size: 24px; }
+.apc-title { font-size: 14px; font-weight: 700; color: var(--green-dark); }
+.apc-sub { font-size: 13px; color: var(--green-mid); margin-top: 2px; }
+.apc-edit {
+  font-size: 13px; font-weight: 600; color: var(--green);
+  text-decoration: none; padding: 6px 14px;
+  border: 1px solid var(--green-200); border-radius: 8px;
+  transition: all .15s;
+}
+.apc-edit:hover { background: var(--green-lite); }
+
+/* ══════════════════════════════════════
+   PROFILE PAGE
+══════════════════════════════════════ */
+.profile-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+.profile-header h2 { font-size: 22px; font-weight: 800; }
+.profile-header p { font-size: 14px; color: var(--text-2); margin-top: 4px; }
+
+.profile-form { display: flex; flex-direction: column; gap: 24px; }
+.pf-section {
+  background: white; border-radius: 16px;
+  padding: 28px; border: 1px solid var(--border);
+}
+.pf-section-title { font-size: 16px; font-weight: 800; margin-bottom: 20px; color: var(--text); }
+.pf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+.comorbidities-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.comorbidity-btn {
+  padding: 8px 16px; border-radius: 100px;
+  border: 1.5px solid var(--border); background: white;
+  font-size: 13px; font-weight: 500; color: var(--text-2);
+  cursor: pointer; transition: all .15s;
+}
+.comorbidity-btn:hover { border-color: var(--green); color: var(--green); }
+.comorbidity-btn.selected {
+  background: var(--green-lite); border-color: var(--green);
+  color: var(--green-dark); font-weight: 700;
+}
+
+.pf-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pf-saved { color: var(--green); font-weight: 700; font-size: 14px; }
+
+/* ══════════════════════════════════════
+   SAVE BUTTON & TAGS
+══════════════════════════════════════ */
+.btn-save {
+  font-size: 13px; font-weight: 600; color: var(--text-2);
+  background: var(--bg); border: 1.5px solid var(--border);
+  padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.btn-save:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+.btn-save:disabled { opacity: .7; cursor: default; }
+
+.tc-reasons { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.reason-tag {
+  background: var(--green-50); color: var(--green-dark);
+  font-size: 12px; font-weight: 600;
+  padding: 3px 10px; border-radius: 100px;
+  border: 1px solid var(--green-200);
+}
+
+.ai-badge {
+  background: var(--green); color: white;
+  font-size: 12px; font-weight: 700;
+  padding: 3px 10px; border-radius: 100px;
+  margin-right: 8px; vertical-align: middle;
+}
+
+/* ══════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════ */
 

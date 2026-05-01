@@ -37,4 +37,8 @@ export const savedAPI = {
   remove: (trialId) => api.delete(`/saved/${trialId}`),
 }
 
+export const matchAPI = {
+  match: (data) => api.post('/match', data),
+}
+
 export default api
