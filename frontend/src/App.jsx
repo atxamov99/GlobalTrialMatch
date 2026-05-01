@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AuthProvider, useAuth } from './store/auth.jsx'
 import { LangProvider } from './store/lang.jsx'
 import LoginPage from './pages/LoginPage.jsx'
@@ -23,21 +24,23 @@ function PublicOnlyRoute({ children }) {
 
 export default function App() {
   return (
-    <LangProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <InstallBanner />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
-            <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
-            <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
-            <Route path="/results" element={<PrivateRoute><ResultsPage /></PrivateRoute>} />
-            <Route path="/applications" element={<PrivateRoute><ApplicationsPage /></PrivateRoute>} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </LangProvider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ''}>
+      <LangProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <InstallBanner />
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
+              <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
+              <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+              <Route path="/results" element={<PrivateRoute><ResultsPage /></PrivateRoute>} />
+              <Route path="/applications" element={<PrivateRoute><ApplicationsPage /></PrivateRoute>} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </LangProvider>
+    </GoogleOAuthProvider>
   )
 }

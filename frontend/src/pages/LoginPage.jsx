@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../store/auth.jsx'
 import { useLang } from '../store/lang.jsx'
 import LangSwitcher from '../components/LangSwitcher.jsx'
+import GoogleBtn from '../components/GoogleBtn.jsx'
 
 const TITLES = {
   uz: { heading: 'Xush kelibsiz!', sub: 'Hisobingizga kiring', submit: 'Kirish', loading: 'Kirilmoqda...', no_acc: 'Hisobingiz yo\'qmi?', register: 'Ro\'yxatdan o\'ting' },
@@ -75,6 +76,9 @@ export default function LoginPage() {
             {loading ? t.loading : t.submit}
           </button>
         </form>
+
+        <div className="auth-divider"><span>yoki</span></div>
+        <GoogleBtn label={lang.code === 'en' ? 'Continue with Google' : lang.code === 'ru' ? 'Войти через Google' : 'Google bilan kirish'} />
 
         <p className="auth-footer">
           {t.no_acc} <Link to="/register">{t.register}</Link>

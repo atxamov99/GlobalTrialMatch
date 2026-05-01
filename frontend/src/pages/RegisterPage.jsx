@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../store/auth.jsx'
 import { useLang } from '../store/lang.jsx'
 import LangSwitcher from '../components/LangSwitcher.jsx'
+import GoogleBtn from '../components/GoogleBtn.jsx'
 
 const TITLES = {
   uz: { heading: 'Hisob yaratish', submit: 'Ro\'yxatdan o\'tish', loading: 'Yaratilmoqda...', has_acc: 'Hisobingiz bormi?', login: 'Kirish', name: 'Ismingiz', pass: 'Parol', pass_hint: 'Kamida 6 ta belgi' },
@@ -87,6 +88,9 @@ export default function RegisterPage() {
             {loading ? t.loading : t.submit}
           </button>
         </form>
+
+        <div className="auth-divider"><span>yoki</span></div>
+        <GoogleBtn label={lang.code === 'en' ? 'Sign up with Google' : lang.code === 'ru' ? 'Регистрация через Google' : 'Google bilan ro\'yxatdan o\'tish'} />
 
         <p className="auth-footer">
           {t.has_acc} <Link to="/login">{t.login}</Link>

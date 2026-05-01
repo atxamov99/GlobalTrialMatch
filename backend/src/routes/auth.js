@@ -1,9 +1,11 @@
 import { Router } from 'express'
 import bcrypt from 'bcryptjs'
+import { OAuth2Client } from 'google-auth-library'
 import db from '../db.js'
 import { signToken, authMiddleware } from '../middleware/auth.js'
 
 const router = Router()
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
@@ -47,6 +49,31 @@ router.post('/login', async (req, res) => {
 
   const token = signToken({ id: user.id, email: user.email, role: user.role })
   res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } })
+})
+
+// POST /api/auth/google  — Google OAuth (access_token yoki userInfo)
+router.post('/google', async (req, res) => {
+  const { email, name, googleId } = req.body
+
+  if (!email || !name) {
+    return res.status(400).json({ error: 'email va name majburiy' })
+  }
+
+  try {
+    let user = db.prepare('SELECT * FROM users WHERE email = ?').get(email)
+
+    if (!user) {
+      const result = db.prepare(
+        'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)'
+      ).run(name, email, `google_${googleId || Date.now()}`, 'patient')
+      user = db.prepare('SELECT * FROM users WHERE id = ?').get(result.lastInsertRowid)
+    }
+
+    const token = signToken({ id: user.id, email: user.email, role: user.role })
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } })
+  } catch (err) {
+    res.status(500).json({ error: 'Server xatoligi' })
+  }
 })
 
 // GET /api/auth/me

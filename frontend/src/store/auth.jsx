@@ -31,13 +31,19 @@ export function AuthProvider({ children }) {
     setUser(res.data.user)
   }
 
+  const loginWithGoogle = async (_credential, userInfo) => {
+    const res = await authAPI.google(userInfo)
+    localStorage.setItem('token', res.data.token)
+    setUser(res.data.user)
+  }
+
   const logout = () => {
     localStorage.removeItem('token')
     setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   )
