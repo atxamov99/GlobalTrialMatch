@@ -758,8 +758,15 @@ a { text-decoration: none; color: inherit; }
   color: var(--green-dark); font-weight: 700;
 }
 
-.pf-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pf-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
 .pf-saved { color: var(--green); font-weight: 700; font-size: 14px; }
+.pf-error { color: #dc2626; font-weight: 700; font-size: 14px; }
+.pf-grid-2 { grid-template-columns: 1fr 1fr; }
+.pf-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 640px) {
+  .pf-grid-2, .pf-grid-3 { grid-template-columns: 1fr; }
+  .pf-grid { grid-template-columns: 1fr; }
+}
 
 /* ══════════════════════════════════════
    SAVE BUTTON & TAGS

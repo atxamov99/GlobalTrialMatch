@@ -37,13 +37,22 @@ export function AuthProvider({ children }) {
     setUser(res.data.user)
   }
 
+  const updateAccount = async (data) => {
+    const res = await authAPI.updateMe(data)
+    if (res.data.token) localStorage.setItem('token', res.data.token)
+    setUser(res.data.user)
+  }
+
+  const changePassword = (currentPassword, newPassword) =>
+    authAPI.changePassword({ currentPassword, newPassword })
+
   const logout = () => {
     localStorage.removeItem('token')
     setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, loginWithGoogle, logout, updateAccount, changePassword }}>
       {children}
     </AuthContext.Provider>
   )

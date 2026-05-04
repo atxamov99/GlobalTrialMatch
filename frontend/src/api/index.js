@@ -13,6 +13,8 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   google: (userInfo) => api.post('/auth/google', userInfo),
   me: () => api.get('/auth/me'),
+  updateMe: (data) => api.patch('/auth/me', data),
+  changePassword: (data) => api.patch('/auth/password', data),
 }
 
 export const trialsAPI = {

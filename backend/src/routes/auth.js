@@ -83,4 +83,60 @@ router.get('/me', authMiddleware, (req, res) => {
   res.json(user)
 })
 
+// PATCH /api/auth/me  — ism va emailni yangilash
+router.patch('/me', authMiddleware, (req, res) => {
+  const { name, email } = req.body
+
+  if (!name && !email) {
+    return res.status(400).json({ error: 'name yoki email kerak' })
+  }
+
+  if (email) {
+    const existing = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email, req.user.id)
+    if (existing) {
+      return res.status(409).json({ error: 'Bu email boshqa foydalanuvchida bor' })
+    }
+  }
+
+  const fields = []
+  const values = []
+  if (name)  { fields.push('name = ?');  values.push(name) }
+  if (email) { fields.push('email = ?'); values.push(email) }
+  values.push(req.user.id)
+
+  db.prepare(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`).run(...values)
+
+  const user = db.prepare('SELECT id, name, email, role FROM users WHERE id = ?').get(req.user.id)
+  const token = signToken({ id: user.id, email: user.email, role: user.role })
+  res.json({ token, user })
+})
+
+// PATCH /api/auth/password  — parolni o'zgartirish
+router.patch('/password', authMiddleware, async (req, res) => {
+  const { currentPassword, newPassword } = req.body
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'currentPassword va newPassword majburiy' })
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'Yangi parol kamida 6 ta belgi bo\'lishi kerak' })
+  }
+
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)
+  if (!user) return res.status(404).json({ error: 'Foydalanuvchi topilmadi' })
+
+  // Google bilan kirgan foydalanuvchilar uchun parol yo'q
+  if (user.password.startsWith('google_')) {
+    return res.status(400).json({ error: 'Google orqali kirgan hisobda parol yo\'q' })
+  }
+
+  const valid = await bcrypt.compare(currentPassword, user.password)
+  if (!valid) return res.status(401).json({ error: 'Joriy parol noto\'g\'ri' })
+
+  const hashed = await bcrypt.hash(newPassword, 10)
+  db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashed, req.user.id)
+
+  res.json({ message: 'Parol muvaffaqiyatli o\'zgartirildi' })
+})
+
 export default router
