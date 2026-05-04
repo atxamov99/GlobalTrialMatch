@@ -26,7 +26,7 @@ function PublicOnlyRoute({ children }) {
 
 export default function App() {
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ''}>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || '68793402087-dpbe83k7kdbuq6hhq53geq6j2ml3m5p5.apps.googleusercontent.com'}>
       <LangProvider>
         <AuthProvider>
           <BrowserRouter>

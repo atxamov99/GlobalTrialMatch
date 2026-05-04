@@ -3,7 +3,7 @@ import { useAuth } from '../store/auth.jsx'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '68793402087-dpbe83k7kdbuq6hhq53geq6j2ml3m5p5.apps.googleusercontent.com'
 
 function GoogleBtnInner({ label }) {
   const { loginWithGoogle } = useAuth()
