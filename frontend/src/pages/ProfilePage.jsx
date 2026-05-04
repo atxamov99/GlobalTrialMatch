@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../store/auth.jsx'
 import { useLang } from '../store/lang.jsx'
 import LangSwitcher from '../components/LangSwitcher.jsx'
+import UserMenu from '../components/UserMenu.jsx'
 import { profileAPI } from '../api/index.js'
 
 const COUNTRIES = [
@@ -16,7 +17,6 @@ const COMORBIDITIES = [
 ]
 
 export default function ProfilePage() {
-  const { user, logout, updateAccount, changePassword } = useAuth()
   const { lang } = useLang()
   const navigate = useNavigate()
   const [form, setForm] = useState({
@@ -27,20 +27,6 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
-
-  // Account settings
-  const [account, setAccount] = useState({ name: '', email: '' })
-  const [accountSaving, setAccountSaving] = useState(false)
-  const [accountMsg, setAccountMsg] = useState('')
-
-  // Password
-  const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
-  const [pwSaving, setPwSaving] = useState(false)
-  const [pwMsg, setPwMsg] = useState('')
-
-  useEffect(() => {
-    if (user) setAccount({ name: user.name || '', email: user.email || '' })
-  }, [user])
 
   useEffect(() => {
     profileAPI.get()
@@ -56,56 +42,6 @@ export default function ProfilePage() {
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
-
-  const handleAccountSave = async (e) => {
-    e.preventDefault()
-    setAccountSaving(true)
-    setAccountMsg('')
-    try {
-      const data = {}
-      if (account.name !== user.name) data.name = account.name
-      if (account.email !== user.email) data.email = account.email
-      if (Object.keys(data).length === 0) {
-        setAccountMsg('Hech narsa o\'zgarmadi')
-      } else {
-        await updateAccount(data)
-        setAccountMsg('✅ Saqlandi!')
-      }
-    } catch (err) {
-      setAccountMsg('❌ ' + (err.response?.data?.error || 'Xatolik'))
-    } finally {
-      setAccountSaving(false)
-      setTimeout(() => setAccountMsg(''), 4000)
-    }
-  }
-
-  const handlePasswordChange = async (e) => {
-    e.preventDefault()
-    setPwSaving(true)
-    setPwMsg('')
-
-    if (pwForm.newPassword !== pwForm.confirmPassword) {
-      setPwMsg('❌ Yangi parollar mos kelmadi')
-      setPwSaving(false)
-      return
-    }
-    if (pwForm.newPassword.length < 6) {
-      setPwMsg('❌ Parol kamida 6 ta belgi bo\'lishi kerak')
-      setPwSaving(false)
-      return
-    }
-
-    try {
-      await changePassword(pwForm.currentPassword, pwForm.newPassword)
-      setPwMsg('✅ Parol o\'zgartirildi!')
-      setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
-    } catch (err) {
-      setPwMsg('❌ ' + (err.response?.data?.error || 'Xatolik'))
-    } finally {
-      setPwSaving(false)
-      setTimeout(() => setPwMsg(''), 4000)
-    }
-  }
 
   const toggleComorbidity = (item) => {
     setForm(f => ({
@@ -147,9 +83,7 @@ export default function ProfilePage() {
           </nav>
           <div className="dash-user">
             <LangSwitcher />
-            <div className="dash-avatar">{user?.name?.[0]?.toUpperCase()}</div>
-            <span className="dash-username">{user?.name}</span>
-            <button onClick={logout} className="dash-logout">{lang.logout}</button>
+            <UserMenu />
           </div>
         </div>
       </header>
@@ -157,99 +91,15 @@ export default function ProfilePage() {
       <main className="results-main">
         <div className="profile-header">
           <div>
-            <h2>Mening Profilim</h2>
+            <h2>Tibbiy profilim</h2>
             <p>Ma'lumotlaringizni to'ldiring — AI aniqroq tavsiyalar beradi</p>
           </div>
-        </div>
-
-        {/* Account settings (har doim ko'rsatiladi) */}
-        <div className="pf-section" style={{ marginBottom: 24 }}>
-          <h3 className="pf-section-title">🔐 Hisob sozlamalari</h3>
-          <form onSubmit={handleAccountSave}>
-            <div className="pf-grid pf-grid-2">
-              <div className="sc-field">
-                <label>Ismingiz</label>
-                <input
-                  type="text"
-                  value={account.name}
-                  onChange={e => setAccount({ ...account, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="sc-field">
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={account.email}
-                  onChange={e => setAccount({ ...account, email: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-            <div className="pf-actions" style={{ marginTop: 16 }}>
-              {accountMsg && <span className={accountMsg.startsWith('✅') ? 'pf-saved' : 'pf-error'}>{accountMsg}</span>}
-              <button type="submit" className="btn-apply" disabled={accountSaving}>
-                {accountSaving ? <><span className="btn-spinner" /> Saqlanmoqda...</> : '💾 Saqlash'}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Password change */}
-        <div className="pf-section" style={{ marginBottom: 24 }}>
-          <h3 className="pf-section-title">🔑 Parolni o'zgartirish</h3>
-          <form onSubmit={handlePasswordChange}>
-            <div className="pf-grid pf-grid-3">
-              <div className="sc-field">
-                <label>Joriy parol</label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={pwForm.currentPassword}
-                  onChange={e => setPwForm({ ...pwForm, currentPassword: e.target.value })}
-                  required
-                  autoComplete="current-password"
-                />
-              </div>
-              <div className="sc-field">
-                <label>Yangi parol</label>
-                <input
-                  type="password"
-                  placeholder="kamida 6 ta belgi"
-                  value={pwForm.newPassword}
-                  onChange={e => setPwForm({ ...pwForm, newPassword: e.target.value })}
-                  required
-                  minLength={6}
-                  autoComplete="new-password"
-                />
-              </div>
-              <div className="sc-field">
-                <label>Yangi parolni tasdiqlash</label>
-                <input
-                  type="password"
-                  placeholder="parolni qayta yozing"
-                  value={pwForm.confirmPassword}
-                  onChange={e => setPwForm({ ...pwForm, confirmPassword: e.target.value })}
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
-            </div>
-            <div className="pf-actions" style={{ marginTop: 16 }}>
-              {pwMsg && <span className={pwMsg.startsWith('✅') ? 'pf-saved' : 'pf-error'}>{pwMsg}</span>}
-              <button type="submit" className="btn-apply" disabled={pwSaving}>
-                {pwSaving ? <><span className="btn-spinner" /> Saqlanmoqda...</> : '🔑 Parolni o\'zgartirish'}
-              </button>
-            </div>
-          </form>
         </div>
 
         {loading ? (
           <div className="loading-center"><div className="spinner" /></div>
         ) : (
           <form onSubmit={handleSave} className="profile-form">
-
-            {/* Asosiy ma'lumotlar */}
             <div className="pf-section">
               <h3 className="pf-section-title">👤 Asosiy ma'lumotlar</h3>
               <div className="pf-grid">
@@ -280,7 +130,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Tibbiy ma'lumotlar */}
             <div className="pf-section">
               <h3 className="pf-section-title">🏥 Tibbiy ma'lumotlar</h3>
               <div className="sc-field" style={{ marginBottom: 20 }}>

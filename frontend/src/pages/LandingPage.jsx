@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../store/auth.jsx'
 import { useLang } from '../store/lang.jsx'
 import LangSwitcher from '../components/LangSwitcher.jsx'
+import UserMenu from '../components/UserMenu.jsx'
 
 const FEATURES = [
   { icon: '🤖', title_uz: 'AI Matching', title_en: 'AI Matching', title_ru: 'ИИ Подбор', desc_uz: 'Sun\'iy intellekt siz uchun 300,000+ tadqiqot ichidan eng mos variantlarni tanlaydi.', desc_en: 'Our AI engine finds the best trials from 300,000+ studies matched to your profile.', desc_ru: 'ИИ подбирает лучшие исследования из 300 000+ по вашему профилю.' },
@@ -154,7 +155,10 @@ export default function LandingPage() {
               ))}
             </div>
             {user ? (
-              <Link to="/dashboard" className="lh-btn-primary">{t.dashboard}</Link>
+              <>
+                <Link to="/dashboard" className="lh-btn-primary">{t.dashboard}</Link>
+                <UserMenu />
+              </>
             ) : (
               <>
                 <Link to="/login" className="lh-btn-ghost">{lang.login}</Link>

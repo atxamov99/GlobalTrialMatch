@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../store/auth.jsx'
 import { useLang } from '../store/lang.jsx'
 import LangSwitcher from '../components/LangSwitcher.jsx'
+import UserMenu from '../components/UserMenu.jsx'
 import { savedAPI, applicationsAPI } from '../api/index.js'
 
 export default function SavedPage() {
@@ -54,9 +55,7 @@ export default function SavedPage() {
           </nav>
           <div className="dash-user">
             <LangSwitcher />
-            <div className="dash-avatar">{user?.name?.[0]?.toUpperCase()}</div>
-            <span className="dash-username">{user?.name}</span>
-            <button onClick={logout} className="dash-logout">{lang.logout}</button>
+            <UserMenu />
           </div>
         </div>
       </header>
